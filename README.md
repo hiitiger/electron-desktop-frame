@@ -6,6 +6,11 @@ Make electron window as Windows wallpaper.
 
 This is only for Windows.
 
+## install
+```
+    npm install --save electron-desktop-frame
+```
+
 ## usage
 
 ```

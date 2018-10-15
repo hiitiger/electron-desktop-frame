@@ -33,10 +33,11 @@ function startMainWindow() {
 function startEmbed() {
     embedWindow = new BrowserWindow({
         show: false,
-        frame: false
+        frame: false,
+        transparent: true
     });
 
-    embedWindow.loadURL("https://google.com");
+    embedWindow.loadFile(path.join(__dirname, "embed.html"))
 
     embedWindow.on("ready-to-show", () => {
         desktopframe.setAsDesktopFrame(embedWindow.getNativeWindowHandle().readUInt32LE(0));
