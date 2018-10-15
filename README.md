@@ -2,7 +2,7 @@
 
 
 ## description
-Make electron window as Windows wallpaper.
+Make electron window 📃 as Windows wallpaper. 
 
 This is only for Windows.
 
@@ -13,16 +13,17 @@ This is only for Windows.
 
 ## install
 ```
+    npm install --save electron-desktop-frame
 ```
 
 ## usage
 
 ```
-    const desktopframe = require("../js/index.js");
+    const desktopframe = require("electron-desktop-frame");
     desktopframe.setAsDesktopFrame(embedWindow.getNativeWindowHandle().readUInt32LE(0));
     ...
     desktopframe.clearDesktopFrame(embedWindow.getNativeWindowHandle().readUInt32LE(0));
 ```
 
 ## todo
-    - [ ] multi desktop support
+    - [x] multi display support

@@ -1,12 +1,46 @@
 #include <napi.h>
 
 #include <Windows.h>
+#include <iostream>
+#include <vector>
+
+struct EnumDisplayStruct {
+    std::vector<RECT> displayRects;
+};
+
+BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor,
+                              HDC      hdcMonitor,
+                              LPRECT   lprcMonitor,
+                              LPARAM   dwData)
+{
+    EnumDisplayStruct* sc = (EnumDisplayStruct*)dwData;
+    MONITORINFO info;
+    info.cbSize = sizeof(info);
+    if (GetMonitorInfo(hMonitor, &info))
+    {
+        // std::cout << "Monitor x: "<< info.rcMonitor.left
+        //           <<" y: "        << info.rcMonitor.top
+        //           <<" w: "        << info.rcMonitor.right - info.rcMonitor.left
+        //           <<" h: "        << info.rcMonitor.bottom - info.rcMonitor.top
+        //           << std::endl;
+        
+        sc->displayRects.push_back(info.rcMonitor);
+    }
+    return TRUE; 
+}
+
 
 Napi::Value setAsDesktopFrame(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
-    bool setted = false;
     HWND browserWindow = (HWND)(std::uint32_t)(info[0].ToNumber());
+    auto displayIndex = 0;
+    if(info.Length() > 1) 
+    {
+        displayIndex = info[1].ToNumber();
+    }
+
+    auto setted = false;
     auto width = GetSystemMetrics(SM_CXSCREEN);
     auto height = GetSystemMetrics(SM_CYSCREEN);
     HWND desktop = GetDesktopWindow();
@@ -73,8 +107,24 @@ Napi::Value setAsDesktopFrame(const Napi::CallbackInfo &info)
 
         if (hWorkerW)
         {
+            auto x = 0;
+            auto y = 0;
+            EnumDisplayStruct sc;
+            EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&sc);
+
+            if(displayIndex != 0)
+            {
+                if(displayIndex < sc.displayRects.size()) 
+                {
+                    x = sc.displayRects[displayIndex].left;
+                    y = sc.displayRects[displayIndex].top;
+                    width = sc.displayRects[displayIndex].right - sc.displayRects[displayIndex].left;
+                    height = sc.displayRects[displayIndex].bottom - sc.displayRects[displayIndex].top;
+                }
+            }
+
             SetParent(browserWindow, hWorkerW);
-            SetWindowPos(browserWindow, NULL, 0, 0, width, height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+            SetWindowPos(browserWindow, NULL, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
             setted = true;
         }
     }

@@ -20,6 +20,12 @@ function startMainWindow() {
 
     mainWindow.loadFile(path.join(__dirname, "index.html"));
 
+    mainWindow.on("closed", () => {
+        if (embedWindow) {
+            stopEmbed();
+        }
+    })
+
     ipcMain.on("start", () => {
         startEmbed();
     });
@@ -37,21 +43,20 @@ function startEmbed() {
         transparent: true
     });
 
-    embedWindow.loadFile(path.join(__dirname, "embed.html"))
+    embedWindow.loadFile(path.join(__dirname, "embed.html"));
 
     embedWindow.on("ready-to-show", () => {
-        desktopframe.setAsDesktopFrame(embedWindow.getNativeWindowHandle().readUInt32LE(0));
+        desktopframe.setAsDesktopFrame(embedWindow.getNativeWindowHandle().readUInt32LE(0), 0);
         embedWindow.show();
-    })
+    });
 
     embedWindow.on("closed", () => {
         embedWindow = null;
-    })
-
+    });
 }
 
 function stopEmbed() {
-    if(embedWindow){
+    if (embedWindow) {
         desktopframe.clearDesktopFrame(embedWindow.getNativeWindowHandle().readUInt32LE(0));
         embedWindow.close();
     }
