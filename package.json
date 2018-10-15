@@ -1,0 +1,21 @@
+{
+  "name": "electron-desktop-frame",
+  "version": "0.1.0",
+  "author": {},
+  "main": "./js/index.js",
+  "types": "./js/index.d.ts",
+  "dependencies": {
+    "node-addon-api": "^1.4.0",
+    "node-gyp": "^3.8.0"
+  },
+  "scripts": {
+    "install": "node-gyp rebuild",
+    "build": "node-gyp build",
+    "build-electron": "electron-rebuild -f",
+    "demo": "electron ./demo/demo.js"
+  },
+  "devDependencies": {
+    "electron": "^3.0.0",
+    "electron-rebuild": "^1.8.2"
+  }
+}
